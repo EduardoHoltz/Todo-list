@@ -7,17 +7,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.carloseduardo.todo_list.models.User;
-import com.carloseduardo.todo_list.repositories.TaskRepository;
 import com.carloseduardo.todo_list.repositories.UserRepository;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private TaskRepository taskRepository;
 
     public User findById(Long id) {
 
@@ -29,19 +24,15 @@ public class UserService {
 
     @Transactional
     public User create(User user) {
-
         user.setId(null);
 
         user = this.userRepository.save(user);
-
-        this.taskRepository.saveAll(user.getTasks());
 
         return user;
     }
 
     @Transactional
     public User update(User user) {
-
         User newUser = findById(user.getId());
 
         newUser.setPassword(user.getPassword());
@@ -50,7 +41,6 @@ public class UserService {
     }
 
     public void delete(Long id) {
-
         findById(id);
 
         try {

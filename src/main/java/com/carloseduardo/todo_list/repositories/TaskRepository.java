@@ -10,6 +10,5 @@ import com.carloseduardo.todo_list.models.Task;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-
     List<Task> findByUser_Id(Long id);
 }
