@@ -8,4 +8,5 @@ import com.carloseduardo.todo_list.models.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     
+    
 }
