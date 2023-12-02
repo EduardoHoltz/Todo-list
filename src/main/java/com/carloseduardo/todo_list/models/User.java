@@ -5,51 +5,54 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = User.TABLE_NAME)
 public class User {
 
-    // # attributes
-
     public interface CreateUser {
     }
 
     public interface UpdateUser {
+
     }
 
     public static final String TABLE_NAME = "user";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
+    @NotEmpty
     private Long id;
 
-    @Column(name = "username", unique = true, nullable = false, length = 100)
-    @NotNull(groups = CreateUser.class)
-    @NotEmpty(groups = CreateUser.class)
-    @Size(groups = CreateUser.class, min = 2, max = 100)
+    @Column(name = "username", unique = true, length = 100, nullable = false)
+    @NotNull(groups = { CreateUser.class })
+    @NotEmpty(groups = { CreateUser.class })
+    @Size(groups = { CreateUser.class }, min = 50, max = 100)
     private String username;
 
-    @JsonProperty(access = Access.WRITE_ONLY)
-    @Column(name = "password", unique = false, nullable = false, length = 8)
+    @Column(name = "password", unique = false, length = 8, nullable = false)
     @NotNull(groups = { CreateUser.class, UpdateUser.class })
     @NotEmpty(groups = { CreateUser.class, UpdateUser.class })
     @Size(groups = { CreateUser.class, UpdateUser.class }, min = 6, max = 8)
+    @JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 
-    // # private List<Task> task = new ArrayList<Task> ();
-
-    // # constructor
+    @OneToMany(mappedBy = "user")
+    private List<Task> tasks = new ArrayList<Task>();
 
     public User() {
     }
@@ -59,8 +62,6 @@ public class User {
         this.username = username;
         this.password = password;
     }
-
-    // # getters setters
 
     public Long getId() {
         return this.id;
@@ -101,14 +102,16 @@ public class User {
         return this;
     }
 
-    // # verifying
+    public List<Task> getTasks() {
+        return this.tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
+    }
 
     @Override
     public boolean equals(Object object) {
-        if (object == null) {
-            return false;
-        }
-
         if (object == this) {
             return true;
         }
@@ -129,16 +132,14 @@ public class User {
             }
         }
 
-        return Objects.equals(this.id, user.id)
-                && Objects.equals(this.username, user.username) && Objects.equals(this.password, user.password);
-
+        return Objects.equals(this.id, user.id) && Objects.equals(this.username, user.username)
+                && Objects.equals(this.password, user.password);
     }
-
-    // # hash code
 
     @Override
     public int hashCode() {
         final int prime = 27;
+
         int result = 1;
 
         result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
